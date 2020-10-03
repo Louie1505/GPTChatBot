@@ -42,21 +42,37 @@ namespace GPTChatBot
             // Create a number to track where the prefix ends and the command begins
             int argPos = 0;
 
-            // Determine if the message is a command based on the prefix and make sure no bots trigger commands
-            if (!(message.HasCharPrefix(Program.configuration["Prefix"][0], ref argPos) ||
-                message.HasMentionPrefix(_client.CurrentUser, ref argPos)) ||
-                message.Author.IsBot)
+            //Ignore bots
+            if (message.Author.IsBot)
                 return;
 
             // Create a WebSocket-based command context based on the message
             var context = new SocketCommandContext(_client, message);
 
-            // Execute the command with the command context we just
-            // created, along with the service provider for precondition checks.
-            await _commands.ExecuteAsync(
-                context: context,
-                argPos: argPos,
-                services: null);
+            if (message.HasCharPrefix(Program.configuration["Prefix"][0], ref argPos))
+            {
+                // Execute the command with the command context we just
+                // created, along with the service provider for precondition checks.
+                await _commands.ExecuteAsync(
+                    context: context,
+                    argPos: argPos,
+                    services: null);
+            }
+            else if(ShouldRandomlySend() || message.HasMentionPrefix(_client.CurrentUser, ref argPos) && !CheckIsOtherBotPrefix(message.Content[0]))
+            {
+                await context.Channel.SendMessageAsync("Hello I am a chat bot");
+            }
+        }
+        bool ShouldRandomlySend()
+        {
+            return true;
+        }
+        /*This makes me sad*/
+        bool CheckIsOtherBotPrefix(char c) 
+        {
+            if (c == '~' || c == '!' || c == '#')
+                return true;
+            return false;
         }
     }
 }
