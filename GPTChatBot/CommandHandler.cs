@@ -1,9 +1,12 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace GPTChatBot
@@ -12,7 +15,7 @@ namespace GPTChatBot
     {
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
-
+        private int messageNum;
         // Retrieve client and CommandService instance via ctor
         public CommandHandler(DiscordSocketClient client, CommandService commands)
         {
@@ -48,8 +51,9 @@ namespace GPTChatBot
 
             // Create a WebSocket-based command context based on the message
             var context = new SocketCommandContext(_client, message);
-
-            if (message.HasCharPrefix(Program.configuration["Prefix"][0], ref argPos))
+            messageNum = int.Parse(ConfigMan.Get("NumMessages"));
+            var messages = await context.Channel.GetMessagesAsync(context.Message, Direction.Before, int.Parse(ConfigMan.Get("NumMessages"))).FlattenAsync();
+            if (message.HasCharPrefix(ConfigMan.Get("Prefix")[0], ref argPos) && (Program.debug || Regex.IsMatch(message.Content, @"\+debug", RegexOptions.IgnoreCase)))
             {
                 // Execute the command with the command context we just
                 // created, along with the service provider for precondition checks.
@@ -58,21 +62,11 @@ namespace GPTChatBot
                     argPos: argPos,
                     services: null);
             }
-            else if(ShouldRandomlySend() || message.HasMentionPrefix(_client.CurrentUser, ref argPos) && !CheckIsOtherBotPrefix(message.Content[0]))
+            else if(BLL.ShouldRandomlySend(context, messages, _client.CurrentUser) || message.HasMentionPrefix(_client.CurrentUser, ref argPos) && !BLL.CheckIsOtherBotPrefix(message.Content[0]))
             {
-                await context.Channel.SendMessageAsync("Hello I am a chat bot");
+                /*@ people properly*/
+                await context.Channel.SendMessageAsync();
             }
-        }
-        bool ShouldRandomlySend()
-        {
-            return true;
-        }
-        /*This makes me sad*/
-        bool CheckIsOtherBotPrefix(char c) 
-        {
-            if (c == '~' || c == '!' || c == '#')
-                return true;
-            return false;
         }
     }
 }

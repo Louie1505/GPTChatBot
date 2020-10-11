@@ -1,27 +1,48 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
-using System.Web.Mvc;
-using System.Net.Http;
-using System.Net;
-using System.Xml;
-using System.Linq;
 
 namespace GPTChatBot
 {
     public class CommandsModule : ModuleBase<SocketCommandContext>
     {
-        [Command("fact")]
-        [Summary("Sends a random fact from API")]
-        public async Task Fact()
+
+        [Command("debug")]
+        [Summary("Toggle debug mode, enables commands")]
+        public async Task Debug()
         {
-            APIHelper.CallAPI(out object fact, HttpVerbs.Get, typeof(Fact), "Facts");
-            if (fact == null)
-                return;
-            // Access the channel from the Command Context.
-            await Context.Channel.SendMessageAsync(((Fact)fact).sFact);
+            Program.debug = !Program.debug;
+            await Context.Channel.SendMessageAsync((Program.debug ? "Entering debug mode" : "Exiting debug mode"));
+        }
+
+        [Command("input")]
+        [Summary("Dumps out the input that it would send to the AI")]
+        public async Task Input()
+        {
+            var messages = await Context.Channel.GetMessagesAsync(Context.Message, Direction.Before, int.Parse(ConfigMan.Get("NumMessages"))).FlattenAsync();
+            await Context.Channel.SendMessageAsync(BLL.input(Context, messages));
+        }
+        [Command("config")]
+        [Summary("Dumps out the config that isn't secret")]
+        public async Task Config()
+        {
+            StringBuilder bob = new StringBuilder();
+            bob.Append($"Generating text from last {ConfigMan.Get("numMessages")} messages (numMessages)\r\n");
+            bob.Append($"1/{ConfigMan.Get("respChance")} chance of responding (respChance)\r\n");
+            bob.Append($"Conversation weighted by {ConfigMan.Get("weightFactor")} (weightFactor)\r\n");
+            await Context.Channel.SendMessageAsync(bob.ToString());
+        }
+        [Command("setconfig")]
+        [Summary("Sets a given config on the fly")]
+        public async Task SetConfig(string key, string value)
+        {
+            if (ConfigMan.Config.ContainsKey(key))
+            {
+                ConfigMan.Update(key, value);
+                await Context.Channel.SendMessageAsync($"Updated {key} to {value}");
+            }
         }
     }
     class Fact

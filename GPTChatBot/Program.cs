@@ -9,6 +9,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,9 +17,14 @@ namespace GPTChatBot
 {
     class Program
     {
-        public static IConfigurationRoot configuration; 
+        static IConfigurationRoot configuration;
+        public static bool debug = false;
+
         public static async Task Main(string[] args)
         {
+#if DEBUG
+            debug = true;
+#endif
             CreateHostBuilder(args).Build().Run();
         }
         public static IHostBuilder CreateHostBuilder(string[] args)
@@ -28,6 +34,7 @@ namespace GPTChatBot
                 .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
                 .AddJsonFile("appsettings.json", false)
                 .Build();
+            ConfigMan.Build(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
 
             return Host.CreateDefaultBuilder(args)
             .ConfigureLogging(
@@ -70,7 +77,7 @@ namespace GPTChatBot
             _client = new DiscordSocketClient();
             _client.Log += Log;
 
-            var token = Program.configuration["Token"];
+            var token = ConfigMan.Get("Token");
 
             await _client.LoginAsync(TokenType.Bot, token);
             await _client.StartAsync();
