@@ -17,7 +17,7 @@ namespace GPTChatBot
         public async Task Debug()
         {
             string users = ConfigMan.Get("adminUsers");
-            if (string.IsNullOrEmpty(users) || users.Split(",").Any(x => x.ToLower() == Context.Message.Author.Username.ToLower()))
+            if (string.IsNullOrEmpty(users) || users.Split(",").Any(x => x.ToLower().Trim() == Context.Message.Author.Username.ToLower()))
             {
                 Program.debug = !Program.debug;
                 await Context.Channel.SendMessageAsync((Program.debug ? "Entering debug mode" : "Exiting debug mode"));

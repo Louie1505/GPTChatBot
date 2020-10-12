@@ -53,14 +53,21 @@ namespace GPTChatBot
             var context = new SocketCommandContext(_client, message);
             messageNum = int.Parse(ConfigMan.Get("NumMessages"));
             var messages = await context.Channel.GetMessagesAsync(context.Message, Direction.Before, int.Parse(ConfigMan.Get("NumMessages"))).FlattenAsync();
-            if (message.HasCharPrefix(ConfigMan.Get("Prefix")[0], ref argPos) && (Program.debug || Regex.IsMatch(message.Content, @"\+debug", RegexOptions.IgnoreCase)))
+            if (message.HasCharPrefix(ConfigMan.Get("Prefix")[0], ref argPos))
             {
-                // Execute the command with the command context we just
-                // created, along with the service provider for precondition checks.
-                await _commands.ExecuteAsync(
-                    context: context,
-                    argPos: argPos,
-                    services: null);
+                if (Program.debug || Regex.IsMatch(message.Content.Trim(), @"\+debug", RegexOptions.IgnoreCase))
+                {
+                    // Execute the command with the command context we just
+                    // created, along with the service provider for precondition checks.
+                    await _commands.ExecuteAsync(
+                        context: context,
+                        argPos: argPos,
+                        services: null);
+                }
+                else
+                {
+                    await context.Channel.SendMessageAsync("This command requires debug mode, send +debug to toggle debug mode.");
+                }
             }
             else if((BLL.ShouldRandomlySend(context, messages, _client.CurrentUser) || Program.talkative) || message.HasMentionPrefix(_client.CurrentUser, ref argPos) && !BLL.CheckIsOtherBotPrefix(message.Content[0]))
             {
