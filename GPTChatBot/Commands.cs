@@ -52,6 +52,13 @@ namespace GPTChatBot
         {
             await Context.Channel.SendMessageAsync(JsonConvert.SerializeObject(ConfigMan.Config, Formatting.Indented));
         }
+        [Command("respond")]
+        [Summary("Set flag to always respond for debugging")]
+        public async Task Respond()
+        {
+            Program.talkative = !Program.talkative;
+            await Context.Channel.SendMessageAsync($"Always respond {(Program.talkative ? "enabled" : "disabled")}");
+        }
     }
     class Fact
     {

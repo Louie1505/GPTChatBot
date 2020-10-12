@@ -62,7 +62,7 @@ namespace GPTChatBot
                     argPos: argPos,
                     services: null);
             }
-            else if(BLL.ShouldRandomlySend(context, messages, _client.CurrentUser) || message.HasMentionPrefix(_client.CurrentUser, ref argPos) && !BLL.CheckIsOtherBotPrefix(message.Content[0]))
+            else if((BLL.ShouldRandomlySend(context, messages, _client.CurrentUser) || Program.talkative) || message.HasMentionPrefix(_client.CurrentUser, ref argPos) && !BLL.CheckIsOtherBotPrefix(message.Content[0]))
             {
                 /*@ people properly*/
                 await context.Channel.SendMessageAsync();

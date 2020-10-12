@@ -19,6 +19,7 @@ namespace GPTChatBot
     {
         static IConfigurationRoot configuration;
         public static bool debug = false;
+        public static bool talkative = false;
 
         public static async Task Main(string[] args)
         {
