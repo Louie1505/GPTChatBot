@@ -3,6 +3,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace GPTChatBot
 {
@@ -43,6 +45,12 @@ namespace GPTChatBot
                 ConfigMan.Update(key, value);
                 await Context.Channel.SendMessageAsync($"Updated {key} to {value}");
             }
+        }
+        [Command("configjson")]
+        [Summary("Dumps out the config as JSON because I'm too lazy to write it")]
+        public async Task ConfigJSON()
+        {
+            await Context.Channel.SendMessageAsync(JsonConvert.SerializeObject(ConfigMan.Config, Formatting.Indented));
         }
     }
     class Fact
