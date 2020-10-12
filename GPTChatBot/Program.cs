@@ -44,8 +44,8 @@ namespace GPTChatBot
                 services.AddHostedService<Worker>()
                   .Configure<EventLogSettings>(config =>
                   {
-                      config.LogName = "Sample Service";
-                      config.SourceName = "Sample Service Source";
+                      config.LogName = "Application";
+                      config.SourceName = "GPTChatBot";
                   });
                 // Add access to generic IConfigurationRoot
                 services.AddSingleton<IConfigurationRoot>(configuration);

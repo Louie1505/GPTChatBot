@@ -32,7 +32,7 @@ namespace GPTChatBot
         {
             foreach (KeyValuePair<string, JToken> kvp in Config)
             {
-                if (key == kvp.Key)
+                if (key.ToLower() == kvp.Key.ToLower())
                 {
                     return kvp.Value.ToString();
                 }
