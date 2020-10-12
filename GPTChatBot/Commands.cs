@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Discord;
@@ -15,8 +16,16 @@ namespace GPTChatBot
         [Summary("Toggle debug mode, enables commands")]
         public async Task Debug()
         {
-            Program.debug = !Program.debug;
-            await Context.Channel.SendMessageAsync((Program.debug ? "Entering debug mode" : "Exiting debug mode"));
+            string users = ConfigMan.Get("adminUsers");
+            if (string.IsNullOrEmpty(users) || users.Split(",").Any(x => x.ToLower() == Context.Message.Author.Username.ToLower()))
+            {
+                Program.debug = !Program.debug;
+                await Context.Channel.SendMessageAsync((Program.debug ? "Entering debug mode" : "Exiting debug mode"));
+            }
+            else 
+            {
+                await Context.Channel.SendMessageAsync("You do not have permission to perform that action");
+            }
         }
 
         [Command("input")]
