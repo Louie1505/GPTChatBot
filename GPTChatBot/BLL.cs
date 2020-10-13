@@ -17,9 +17,13 @@ namespace GPTChatBot
         public static string input(SocketCommandContext context, IEnumerable<IMessage> messages) 
         { 
             StringBuilder input = new StringBuilder();
+            string formatter = ConfigMan.Get("messageFormat");
             foreach (var message in messages.ToArray().Reverse())
             {
-                input.Append($"{message.Author.Username}: {message.Content}\r\n");
+                if(!string.IsNullOrEmpty(formatter))
+                    input.Append((formatter + "\r\n").Replace("[author]", message.Author.Username).Replace("[content]", message.Content);
+                else
+                    input.Append($"{message.Author.Username}: {message.Content}\r\n");
             }
             return input.ToString();
         }
