@@ -18,7 +18,7 @@ Requires a finetuned GPT-2 model ran against discord logs. Below is the process 
 
 Setup:
 
-Program requires appsettings.json creating in root with the folliwing keys/structure:
+Program requires appsettings.json creating in root with the following keys/structure:
 
 {
 
