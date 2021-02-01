@@ -339,3 +339,5 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 /GPTChatBot/appsettings.json
+/GPTChatBot/gpt2/models/117M
+/GPTChatBot/gpt2/src/models/117M
